@@ -1,19 +1,18 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { mockAuthService as authService } from '@/services/mock.service'
+import { authService } from '@/services'
 import { apiService } from '@/services/api.service'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const token = ref(localStorage.getItem('access_token') || null)
-  const refreshToken = ref(localStorage.getItem('refresh_token') || null)
   const isInitialized = ref(false)
   const isLoading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value && !!user.value)
   const isAdmin = computed(() => user.value?.role === 'admin')
-  const isTeacher = computed(() => user.value?.role === 'teacher')
-  const isStudent = computed(() => user.value?.role === 'student')
+  const isGuard = computed(() => user.value?.role === 'guard')
+  const isMember = computed(() => user.value?.role === 'member')
   const userRole = computed(() => user.value?.role || null)
 
   async function initializeAuth() {
@@ -21,6 +20,7 @@ export const useAuthStore = defineStore('auth', () => {
       isInitialized.value = true
       return
     }
+    apiService.setToken(token.value)
     try {
       const { data } = await authService.getProfile()
       user.value = data
@@ -35,14 +35,13 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading.value = true
     try {
       const { data } = await authService.login(credentials)
-      token.value = data.access
-      refreshToken.value = data.refresh
+      token.value = data.token
       user.value = data.user
-      localStorage.setItem('access_token', data.access)
-      localStorage.setItem('refresh_token', data.refresh)
+      localStorage.setItem('access_token', data.token)
+      apiService.setToken(data.token)
       return { success: true }
     } catch (err) {
-      return { success: false, message: err.response?.data?.detail || 'Login yoki parol xato' }
+      return { success: false, message: err.response?.data?.message || 'Login yoki parol xato' }
     } finally {
       isLoading.value = false
     }
@@ -50,7 +49,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function logout() {
     try {
-      await authService.logout({ refresh: refreshToken.value })
+      await authService.logout()
     } finally {
       clearAuth()
     }
@@ -60,18 +59,11 @@ export const useAuthStore = defineStore('auth', () => {
     return (await authService.changePassword(payload)).data
   }
 
-  async function changeLogin(payload) {
-    const data = (await authService.changeLogin(payload)).data
-    user.value = { ...user.value, username: payload.username }
-    return data
-  }
-
   function clearAuth() {
     user.value = null
     token.value = null
-    refreshToken.value = null
     localStorage.removeItem('access_token')
-    localStorage.removeItem('refresh_token')
+    apiService.clearToken()
   }
 
   return {
@@ -81,14 +73,13 @@ export const useAuthStore = defineStore('auth', () => {
     isLoading,
     isAuthenticated,
     isAdmin,
-    isTeacher,
-    isStudent,
+    isGuard,
+    isMember,
     userRole,
     initializeAuth,
     login,
     logout,
     changePassword,
-    changeLogin,
     clearAuth,
   }
 })

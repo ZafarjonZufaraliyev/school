@@ -21,8 +21,8 @@ export function setupGuards(router) {
     if (requiredRole && authStore.userRole !== requiredRole) {
       const role = authStore.userRole
       if (role === 'admin') return '/admin/dashboard'
-      if (role === 'teacher') return '/teacher/dashboard'
-      if (role === 'student') return '/student/dashboard'
+      if (role === 'guard') return '/guard/scanner'
+      if (role === 'member') return '/member/qr'
       return '/login'
     }
 
@@ -30,8 +30,8 @@ export function setupGuards(router) {
     if (to.name === 'login' && authStore.isAuthenticated) {
       const role = authStore.userRole
       if (role === 'admin') return '/admin/dashboard'
-      if (role === 'teacher') return '/teacher/dashboard'
-      return '/student/dashboard'
+      if (role === 'guard') return '/guard/scanner'
+      return '/member/qr'
     }
 
     // Allow navigation

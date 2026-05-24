@@ -17,18 +17,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import {
-  LayoutDashboard,
-  Users,
-  GraduationCap,
-  BookOpen,
-  Calendar,
-  BarChart3,
-  FileText,
-  Settings,
-  FolderOpen,
-  UserPlus,
-} from 'lucide-vue-next'
+import { LayoutDashboard, Users, FileBarChart, FileText, Settings, Radio } from 'lucide-vue-next'
 import AppSidebar from '@/components/layout/AppSidebar.vue'
 import AppHeader from '@/components/layout/AppHeader.vue'
 
@@ -37,30 +26,21 @@ const sidebarCollapsed = ref(false)
 
 const navItems = [
   { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/admin/users', label: 'Foydalanuvchilar', icon: UserPlus },
-  { to: '/admin/students', label: "O'quvchilar", icon: GraduationCap },
-  { to: '/admin/teachers', label: "O'qituvchilar", icon: Users },
-  { to: '/admin/groups', label: 'Guruhlar', icon: BookOpen },
-  { to: '/admin/subjects', label: 'Fanlar', icon: FileText },
-  { to: '/admin/schedule', label: 'Dars jadvali', icon: Calendar },
-  { to: '/admin/statistics/attendance', label: 'Davomat stat.', icon: BarChart3 },
-  { to: '/admin/statistics/grades', label: "O'zlashtirish", icon: BarChart3 },
-  { to: '/admin/statistics/weekly', label: 'Haftalik natija', icon: BarChart3 },
-  { to: '/admin/resources', label: 'Resurslar', icon: FolderOpen },
+  { to: '/admin/live', label: 'Jonli Monitoring', icon: Radio },
+  { to: '/admin/users', label: 'Foydalanuvchilar', icon: Users },
+  { to: '/admin/reports/daily', label: 'Kunlik Hisobot', icon: FileText },
+  { to: '/admin/reports/summary', label: 'Umumiy Hisobot', icon: FileBarChart },
+  { to: '/admin/settings', label: 'Sozlamalar', icon: Settings },
 ]
 
 const titleMap = {
-  'admin-dashboard': 'Dashboard',
+  'admin-dashboard': 'Bosh sahifa',
+  'admin-live': 'Jonli Monitoring',
   'admin-users': 'Foydalanuvchilar',
-  'admin-students': "O'quvchilar",
-  'admin-teachers': "O'qituvchilar",
-  'admin-groups': 'Guruhlar',
-  'admin-subjects': 'Fanlar',
-  'admin-schedule': 'Dars jadvali',
-  'admin-attendance-stat': 'Davomat statistikasi',
-  'admin-grades-stat': "O'zlashtirish statistikasi",
-  'admin-weekly': 'Haftalik natijalar',
-  'admin-resources': 'Resurslar',
+  'admin-user-detail': 'Foydalanuvchi',
+  'admin-report-daily': 'Kunlik Hisobot',
+  'admin-report-summary': 'Umumiy Hisobot',
+  'admin-settings': 'Sozlamalar',
 }
 const pageTitle = computed(() => titleMap[route.name] || 'Admin Panel')
 </script>

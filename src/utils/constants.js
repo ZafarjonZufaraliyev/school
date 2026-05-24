@@ -1,37 +1,40 @@
 export const ROLES = {
   ADMIN: 'admin',
-  TEACHER: 'teacher',
-  STUDENT: 'student',
+  GUARD: 'guard',
+  MEMBER: 'member',
 }
 
-export const ATTENDANCE_STATUS = {
-  PRESENT: 'present',
-  ABSENT: 'absent',
-  EXCUSED: 'excused',
+export const CATEGORIES = {
+  STUDENT: 'student',
+  TEACHER: 'teacher',
+  STAFF: 'staff',
+}
+
+export const CATEGORY_LABELS = {
+  student: "O'quvchi",
+  teacher: "O'qituvchi",
+  staff: 'Xodim',
+}
+
+export const CATEGORY_COLORS = {
+  student: '#6366f1',
+  teacher: '#10b981',
+  staff: '#f59e0b',
+}
+
+export const ATTENDANCE_TYPE = {
+  CHECKIN: 'checkin',
+  CHECKOUT: 'checkout',
 }
 
 export const ATTENDANCE_LABELS = {
-  present: 'Keldi',
-  absent: 'Kelmadi',
-  excused: 'Sababli',
+  checkin: 'Keldi',
+  checkout: 'Ketdi',
 }
 
-export const RESOURCE_TYPES = {
-  PDF: 'pdf',
-  WORD: 'word',
-  VIDEO: 'video',
-  LINK: 'link',
-  FILE: 'file',
+export const WEEK_DAYS = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba']
+
+export const QR_PREFIX = {
+  IN: 'QR_IN',
+  OUT: 'QR_OUT',
 }
-
-export const RESOURCE_TYPE_LABELS = {
-  pdf: 'PDF',
-  word: 'Word',
-  video: 'Video',
-  link: 'Havola',
-  file: 'Fayl',
-}
-
-export const WEEK_DAYS = ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba']
-
-export const GRADE_MAX = 100

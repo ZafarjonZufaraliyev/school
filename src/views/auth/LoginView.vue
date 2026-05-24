@@ -2,8 +2,8 @@
   <div class="login-card">
     <!-- Header -->
     <div class="login-header">
-      <div class="login-logo">E</div>
-      <h2>Xush kelibsiz!</h2>
+      <div class="login-logo"><ShieldCheck :size="28" /></div>
+      <h2>Kelib-Ketish Tizimi</h2>
       <p>Tizimga kirish uchun ma'lumotlaringizni kiriting</p>
     </div>
 
@@ -99,20 +99,8 @@ const errorMsg = ref('')
 // Demo foydalanuvchilar — backend tayyor bo'lgach o'zgartiring
 const demoUsers = [
   { role: 'admin', label: 'Admin', username: 'admin', password: 'admin123', icon: ShieldCheck },
-  {
-    role: 'teacher',
-    label: "O'qituvchi",
-    username: 'teacher',
-    password: 'teacher123',
-    icon: BookOpen,
-  },
-  {
-    role: 'student',
-    label: "O'quvchi",
-    username: 'student',
-    password: 'student123',
-    icon: GraduationCap,
-  },
+  { role: 'guard', label: 'Navbatchi', username: 'guard', password: 'guard123', icon: BookOpen },
+  { role: 'member', label: "A'zo", username: 'aliyev', password: 'pass123', icon: GraduationCap },
 ]
 
 function fillDemo(demo) {

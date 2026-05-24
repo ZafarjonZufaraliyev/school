@@ -1,62 +1,80 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import { mockAttendanceService as attendanceService } from '@/services/mock.service'
+import { ref } from 'vue'
+import { attendanceService } from '@/services'
 
 export const useAttendanceStore = defineStore('attendance', () => {
-  const records = ref([])
-  const studentAttendance = ref([])
+  const liveList = ref([])
+  const dailyLogs = ref([])
+  const stats = ref(null)
   const isLoading = ref(false)
+  const scanResult = ref(null)
 
-  const attendanceStats = computed(() => {
-    const stats = {}
-    records.value.forEach((r) => {
-      if (!stats[r.student_id])
-        stats[r.student_id] = { present: 0, absent: 0, excused: 0, total: 0, percentage: 0 }
-      stats[r.student_id].total++
-      if (r.status === 'present') stats[r.student_id].present++
-      if (r.status === 'absent') stats[r.student_id].absent++
-      if (r.status === 'excused') stats[r.student_id].excused++
-    })
-    Object.keys(stats).forEach((id) => {
-      const s = stats[id]
-      s.percentage = s.total ? Math.round((s.present / s.total) * 100) : 0
-    })
-    return stats
-  })
-
-  async function fetchAttendance(params = {}) {
-    isLoading.value = true
-    try {
-      const { data } = await attendanceService.getAll(params)
-      records.value = data
-    } finally {
-      isLoading.value = false
+  async function scan(qrCode) {
+    const { data } = await attendanceService.scan(qrCode)
+    scanResult.value = data
+    if (data.log?.type === 'checkin') {
+      liveList.value.unshift(data.log)
+    } else if (data.log?.type === 'checkout') {
+      liveList.value = liveList.value.filter((l) => l.user_id !== data.log.user_id)
     }
-  }
-
-  async function saveAttendance(payload) {
-    const { data } = await attendanceService.save(payload)
     return data
   }
 
-  async function fetchStudentAttendance(studentId, params = {}) {
+  async function manualCheckin(userId) {
+    const { data } = await attendanceService.manualCheckin(userId)
+    liveList.value.unshift(data)
+    return data
+  }
+
+  async function manualCheckout(userId) {
+    const { data } = await attendanceService.manualCheckout(userId)
+    liveList.value = liveList.value.filter((l) => l.user_id !== userId)
+    return data
+  }
+
+  async function fetchLive() {
     isLoading.value = true
     try {
-      const { data } = await attendanceService.getStudentAttendance(studentId, params)
-      studentAttendance.value = data
-      return data
+      const { data } = await attendanceService.getLive()
+      liveList.value = data
     } finally {
       isLoading.value = false
     }
   }
 
+  async function fetchDaily(date) {
+    isLoading.value = true
+    try {
+      const { data } = await attendanceService.getDaily(date)
+      dailyLogs.value = data
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  async function fetchStats() {
+    const { data } = await attendanceService.getStats()
+    stats.value = data
+    return data
+  }
+
+  async function fetchByUser(userId, params = {}) {
+    const { data } = await attendanceService.getByUser(userId, params)
+    return data
+  }
+
   return {
-    records,
-    studentAttendance,
+    liveList,
+    dailyLogs,
+    stats,
     isLoading,
-    attendanceStats,
-    fetchAttendance,
-    saveAttendance,
-    fetchStudentAttendance,
+    scanResult,
+    scan,
+    manualCheckin,
+    manualCheckout,
+    fetchLive,
+    fetchDaily,
+    fetchStats,
+    fetchByUser,
   }
 })

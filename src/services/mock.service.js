@@ -1,359 +1,201 @@
 /**
- * Mock Service — backend tayyor bo'lguncha ishlatiladi.
- * Haqiqiy backend ulanganda bu faylni o'chirib, api.service.js ga o'ting.
+ * Mock Service — Kelib-Ketish Nazorat Tizimi
+ * Backend tayyor bo'lguncha ishlatiladi.
  */
 
-// ── Mock foydalanuvchilar ──────────────────────────────────────
+const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms))
+
+// ── Mock Kategoriyalar ────────────────────────────────────────
+export const MOCK_CATEGORIES = [
+  { id: 1, name: "O'quvchi", slug: 'student', color: '#6366f1' },
+  { id: 2, name: "O'qituvchi", slug: 'teacher', color: '#10b981' },
+  { id: 3, name: 'Xodim', slug: 'staff', color: '#f59e0b' },
+]
+
+// ── Mock Sinflar ──────────────────────────────────────────────
+export const MOCK_CLASSES = [
+  { id: 1, name: '9-A sinf', category_id: 1 },
+  { id: 2, name: '9-B sinf', category_id: 1 },
+  { id: 3, name: '10-A sinf', category_id: 1 },
+  { id: 4, name: "O'qituvchilar", category_id: 2 },
+  { id: 5, name: 'Texnik xodimlar', category_id: 3 },
+]
+
+// ── Mock Foydalanuvchilar ─────────────────────────────────────
 const MOCK_USERS = [
   {
     id: 1,
     username: 'admin',
     password: 'admin123',
     role: 'admin',
-    full_name: 'Abdullayev Admin',
+    full_name: 'Abdullayev Sardor',
     phone: '+998 90 111 11 11',
-    email: 'admin@eduuz.uz',
+    category: null,
+    class: null,
+    photo: null,
+    qr_checkin: 'QR_IN_1_abc111',
+    qr_checkout: 'QR_OUT_1_abc111',
   },
   {
     id: 2,
-    username: 'teacher',
-    password: 'teacher123',
-    role: 'teacher',
-    full_name: 'Karimov Bobur',
+    username: 'guard',
+    password: 'guard123',
+    role: 'guard',
+    full_name: 'Nazarov Ulmas',
     phone: '+998 90 222 22 22',
-    email: 'teacher@eduuz.uz',
+    category: null,
+    class: null,
+    photo: null,
+    qr_checkin: 'QR_IN_2_abc222',
+    qr_checkout: 'QR_OUT_2_abc222',
   },
   {
     id: 3,
-    username: 'student',
-    password: 'student123',
-    role: 'student',
-    full_name: 'Yusupova Malika',
-    phone: '+998 90 333 33 33',
-    email: 'student@eduuz.uz',
-    group: { id: 1, name: 'G-101' },
-  },
-]
-
-// ── Mock Groups ───────────────────────────────────────────────
-export const MOCK_GROUPS = [
-  { id: 1, name: 'G-101', students_count: 18, subjects_count: 4 },
-  { id: 2, name: 'G-102', students_count: 22, subjects_count: 5 },
-  { id: 3, name: 'G-103', students_count: 15, subjects_count: 4 },
-  { id: 4, name: 'G-201', students_count: 20, subjects_count: 6 },
-  { id: 5, name: 'G-202', students_count: 17, subjects_count: 5 },
-]
-
-// ── Mock Subjects ─────────────────────────────────────────────
-export const MOCK_SUBJECTS = [
-  { id: 1, name: 'Matematika' },
-  { id: 2, name: 'Fizika' },
-  { id: 3, name: 'Ingliz tili' },
-  { id: 4, name: 'Informatika' },
-  { id: 5, name: 'Kimyo' },
-  { id: 6, name: 'Biologiya' },
-]
-
-// ── Mock Students ─────────────────────────────────────────────
-export const MOCK_STUDENTS = [
-  {
-    id: 10,
-    username: 'student1',
+    username: 'aliyev',
+    password: 'pass123',
+    role: 'member',
     full_name: 'Aliyev Jasur',
-    role: 'student',
     phone: '+998 90 100 01 01',
-    group: { id: 1, name: 'G-101' },
+    parent_phone: '+998 90 900 01 01',
+    category: MOCK_CATEGORIES[0],
+    class: { id: 1, name: '9-A sinf' },
+    photo: null,
+    qr_checkin: 'QR_IN_3_abc333',
+    qr_checkout: 'QR_OUT_3_abc333',
   },
   {
-    id: 11,
-    username: 'student2',
+    id: 4,
+    username: 'nazarova',
+    password: 'pass123',
+    role: 'member',
     full_name: 'Nazarova Dilnoza',
-    role: 'student',
     phone: '+998 90 100 02 02',
-    group: { id: 1, name: 'G-101' },
-  },
-  {
-    id: 12,
-    username: 'student3',
-    full_name: 'Toshmatov Sherzod',
-    role: 'student',
-    phone: '+998 90 100 03 03',
-    group: { id: 2, name: 'G-102' },
-  },
-  {
-    id: 13,
-    username: 'student4',
-    full_name: 'Xoliqova Feruza',
-    role: 'student',
-    phone: '+998 90 100 04 04',
-    group: { id: 2, name: 'G-102' },
-  },
-  {
-    id: 14,
-    username: 'student5',
-    full_name: 'Rahimov Otabek',
-    role: 'student',
-    phone: '+998 90 100 05 05',
-    group: { id: 3, name: 'G-103' },
-  },
-]
-
-// ── Mock Teachers ─────────────────────────────────────────────
-export const MOCK_TEACHERS = [
-  {
-    id: 20,
-    username: 'teacher1',
-    full_name: 'Karimov Bobur',
-    role: 'teacher',
-    phone: '+998 90 200 01 01',
-  },
-  {
-    id: 21,
-    username: 'teacher2',
-    full_name: 'Mirzayeva Gulnora',
-    role: 'teacher',
-    phone: '+998 90 200 02 02',
-  },
-  {
-    id: 22,
-    username: 'teacher3',
-    full_name: 'Umarov Sanjar',
-    role: 'teacher',
-    phone: '+998 90 200 03 03',
-  },
-]
-
-// ── Mock Assignments ──────────────────────────────────────────
-export const MOCK_ASSIGNMENTS = [
-  {
-    id: 1,
-    title: 'Kvadrat tenglamalar',
-    description: 'Berilgan masalalarni yeching',
-    group_id: 1,
-    subject: { id: 1, name: 'Matematika' },
-    deadline: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString(),
-    upload_open: true,
-    submissions_count: 12,
-  },
-  {
-    id: 2,
-    title: 'Nyuton qonunlari',
-    description: 'Fizika laboratoriya ishi',
-    group_id: 1,
-    subject: { id: 2, name: 'Fizika' },
-    deadline: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
-    upload_open: true,
-    submissions_count: 8,
-  },
-  {
-    id: 3,
-    title: 'Essay: My Future',
-    description: 'Write 200 words essay',
-    group_id: 2,
-    subject: { id: 3, name: 'Ingliz tili' },
-    deadline: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
-    upload_open: false,
-    submissions_count: 20,
-  },
-  {
-    id: 4,
-    title: 'Python dasturlash',
-    description: 'Calculator dasturi yozing',
-    group_id: 1,
-    subject: { id: 4, name: 'Informatika' },
-    deadline: new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString(),
-    upload_open: true,
-    submissions_count: 5,
-  },
-]
-
-// ── Mock Resources ────────────────────────────────────────────
-export const MOCK_RESOURCES = [
-  {
-    id: 1,
-    title: 'Algebra darslik',
-    type: 'pdf',
-    subject: { name: 'Matematika' },
-    file_name: 'algebra.pdf',
-  },
-  {
-    id: 2,
-    title: 'Fizika video',
-    type: 'video',
-    subject: { name: 'Fizika' },
-    url: 'https://youtube.com',
-  },
-  {
-    id: 3,
-    title: 'Grammar guide',
-    type: 'word',
-    subject: { name: 'Ingliz tili' },
-    file_name: 'grammar.docx',
-  },
-  {
-    id: 4,
-    title: 'Python tutorial',
-    type: 'link',
-    subject: { name: 'Informatika' },
-    url: 'https://python.org',
-  },
-]
-
-// ── Mock Schedule ─────────────────────────────────────────────
-export const MOCK_SCHEDULE = [
-  {
-    id: 1,
-    day: 'Dushanba',
-    start_time: '09:00',
-    end_time: '10:30',
-    subject: { name: 'Matematika' },
-    teacher: { full_name: 'Karimov Bobur' },
-    room: '101',
-    group_id: 1,
-  },
-  {
-    id: 2,
-    day: 'Dushanba',
-    start_time: '11:00',
-    end_time: '12:30',
-    subject: { name: 'Fizika' },
-    teacher: { full_name: 'Mirzayeva Gulnora' },
-    room: '202',
-    group_id: 1,
-  },
-  {
-    id: 3,
-    day: 'Seshanba',
-    start_time: '09:00',
-    end_time: '10:30',
-    subject: { name: 'Ingliz tili' },
-    teacher: { full_name: 'Umarov Sanjar' },
-    room: '305',
-    group_id: 1,
-  },
-  {
-    id: 4,
-    day: 'Chorshanba',
-    start_time: '10:00',
-    end_time: '11:30',
-    subject: { name: 'Informatika' },
-    teacher: { full_name: 'Karimov Bobur' },
-    room: 'Lab',
-    group_id: 1,
+    parent_phone: '+998 90 900 02 02',
+    category: MOCK_CATEGORIES[0],
+    class: { id: 1, name: '9-A sinf' },
+    photo: null,
+    qr_checkin: 'QR_IN_4_abc444',
+    qr_checkout: 'QR_OUT_4_abc444',
   },
   {
     id: 5,
-    day: 'Payshanba',
-    start_time: '09:00',
-    end_time: '10:30',
-    subject: { name: 'Kimyo' },
-    teacher: { full_name: 'Mirzayeva Gulnora' },
-    room: '104',
-    group_id: 2,
+    username: 'karimov',
+    password: 'pass123',
+    role: 'member',
+    full_name: 'Karimov Bobur',
+    phone: '+998 90 200 01 01',
+    category: MOCK_CATEGORIES[1],
+    class: { id: 4, name: "O'qituvchilar" },
+    photo: null,
+    qr_checkin: 'QR_IN_5_abc555',
+    qr_checkout: 'QR_OUT_5_abc555',
   },
   {
     id: 6,
-    day: 'Juma',
-    start_time: '14:00',
-    end_time: '15:30',
-    subject: { name: 'Biologiya' },
-    teacher: { full_name: 'Umarov Sanjar' },
-    room: '201',
-    group_id: 2,
+    username: 'mirzayeva',
+    password: 'pass123',
+    role: 'member',
+    full_name: 'Mirzayeva Gulnora',
+    phone: '+998 90 200 02 02',
+    category: MOCK_CATEGORIES[1],
+    class: { id: 4, name: "O'qituvchilar" },
+    photo: null,
+    qr_checkin: 'QR_IN_6_abc666',
+    qr_checkout: 'QR_OUT_6_abc666',
   },
-]
-
-// ── Mock Attendance ───────────────────────────────────────────
-export const MOCK_ATTENDANCE = [
-  { id: 1, student_id: 10, subject: { name: 'Matematika' }, date: '2026-05-01', status: 'present' },
-  { id: 2, student_id: 10, subject: { name: 'Fizika' }, date: '2026-05-02', status: 'absent' },
-  {
-    id: 3,
-    student_id: 10,
-    subject: { name: 'Ingliz tili' },
-    date: '2026-05-05',
-    status: 'present',
-  },
-  {
-    id: 4,
-    student_id: 10,
-    subject: { name: 'Informatika' },
-    date: '2026-05-06',
-    status: 'excused',
-  },
-  { id: 5, student_id: 10, subject: { name: 'Matematika' }, date: '2026-05-08', status: 'present' },
-  { id: 6, student_id: 10, subject: { name: 'Fizika' }, date: '2026-05-09', status: 'present' },
   {
     id: 7,
-    student_id: 10,
-    subject: { name: 'Ingliz tili' },
-    date: '2026-05-12',
-    status: 'present',
+    username: 'toshmatov',
+    password: 'pass123',
+    role: 'member',
+    full_name: 'Toshmatov Sherzod',
+    phone: '+998 90 100 03 03',
+    parent_phone: '+998 90 900 03 03',
+    category: MOCK_CATEGORIES[0],
+    class: { id: 2, name: '9-B sinf' },
+    photo: null,
+    qr_checkin: 'QR_IN_7_abc777',
+    qr_checkout: 'QR_OUT_7_abc777',
   },
-  { id: 8, student_id: 10, subject: { name: 'Informatika' }, date: '2026-05-13', status: 'absent' },
+  {
+    id: 8,
+    username: 'xoliqov',
+    password: 'pass123',
+    role: 'member',
+    full_name: 'Xoliqov Mansur',
+    phone: '+998 90 300 01 01',
+    category: MOCK_CATEGORIES[2],
+    class: { id: 5, name: 'Texnik xodimlar' },
+    photo: null,
+    qr_checkin: 'QR_IN_8_abc888',
+    qr_checkout: 'QR_OUT_8_abc888',
+  },
 ]
 
-// ── Mock Grades ───────────────────────────────────────────────
-export const MOCK_GRADES = [
+// ── Mock Davomat Loglari ──────────────────────────────────────
+const now = new Date()
+const today = now.toISOString().split('T')[0]
+
+let MOCK_LOGS = [
   {
     id: 1,
-    student_id: 10,
-    subject: { name: 'Matematika' },
-    grade: 88,
-    date: '2026-05-03',
-    comment: 'Yaxshi',
+    user_id: 3,
+    user: { id: 3, full_name: 'Aliyev Jasur', category: MOCK_CATEGORIES[0], class: { name: '9-A sinf' } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 7200000).toISOString(),
+    is_late: false,
   },
   {
     id: 2,
-    student_id: 10,
-    subject: { name: 'Fizika' },
-    grade: 75,
-    date: '2026-05-04',
-    comment: '',
+    user_id: 4,
+    user: { id: 4, full_name: 'Nazarova Dilnoza', category: MOCK_CATEGORIES[0], class: { name: '9-A sinf' } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 6900000).toISOString(),
+    is_late: true,
   },
   {
     id: 3,
-    student_id: 10,
-    subject: { name: 'Ingliz tili' },
-    grade: 92,
-    date: '2026-05-07',
-    comment: "A'lo",
+    user_id: 5,
+    user: { id: 5, full_name: 'Karimov Bobur', category: MOCK_CATEGORIES[1], class: { name: "O'qituvchilar" } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 7500000).toISOString(),
+    is_late: false,
   },
   {
     id: 4,
-    student_id: 10,
-    subject: { name: 'Informatika' },
-    grade: 95,
-    date: '2026-05-10',
-    comment: 'Mukammal',
+    user_id: 3,
+    user: { id: 3, full_name: 'Aliyev Jasur', category: MOCK_CATEGORIES[0], class: { name: '9-A sinf' } },
+    type: 'checkout',
+    scanned_at: new Date(now.getTime() - 3600000).toISOString(),
+    is_late: false,
   },
-  { id: 5, student_id: 10, subject: { name: 'Kimyo' }, grade: 68, date: '2026-05-11', comment: '' },
+  {
+    id: 5,
+    user_id: 7,
+    user: { id: 7, full_name: 'Toshmatov Sherzod', category: MOCK_CATEGORIES[0], class: { name: '9-B sinf' } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 6600000).toISOString(),
+    is_late: false,
+  },
+  {
+    id: 6,
+    user_id: 8,
+    user: { id: 8, full_name: 'Xoliqov Mansur', category: MOCK_CATEGORIES[2], class: { name: 'Texnik xodimlar' } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 7800000).toISOString(),
+    is_late: false,
+  },
+  {
+    id: 7,
+    user_id: 6,
+    user: { id: 6, full_name: 'Mirzayeva Gulnora', category: MOCK_CATEGORIES[1], class: { name: "O'qituvchilar" } },
+    type: 'checkin',
+    scanned_at: new Date(now.getTime() - 6000000).toISOString(),
+    is_late: true,
+  },
 ]
 
-// ── Mock Notifications ────────────────────────────────────────
-export const MOCK_NOTIFICATIONS = [
-  {
-    id: 1,
-    message: "Matematika topshirig'i uchun deadline yaqinlashmoqda",
-    is_read: false,
-    created_at: new Date(Date.now() - 600000).toISOString(),
-  },
-  {
-    id: 2,
-    message: 'Fizika darsiga davomat belgilandi',
-    is_read: false,
-    created_at: new Date(Date.now() - 3600000).toISOString(),
-  },
-  {
-    id: 3,
-    message: 'Yangi resurs yuklandi: Algebra darslik',
-    is_read: true,
-    created_at: new Date(Date.now() - 86400000).toISOString(),
-  },
-]
-
-// ── Helper: simulate async delay ─────────────────────────────
-const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms))
+let nextLogId = 10
 
 // ── Mock Auth Service ─────────────────────────────────────────
 export const mockAuthService = {
@@ -362,12 +204,11 @@ export const mockAuthService = {
     const user = MOCK_USERS.find(
       (u) => u.username === credentials.username && u.password === credentials.password,
     )
-    if (!user) throw { response: { data: { detail: 'Login yoki parol xato' } } }
+    if (!user) throw { response: { data: { message: 'Login yoki parol xato' } } }
     const { password: _, ...safeUser } = user
     return {
       data: {
-        access: 'mock-access-token-' + user.role,
-        refresh: 'mock-refresh-token-' + user.role,
+        token: 'mock-token-' + user.role + '-' + user.id,
         user: safeUser,
       },
     }
@@ -379,19 +220,16 @@ export const mockAuthService = {
   async getProfile() {
     await delay(200)
     const token = localStorage.getItem('access_token') || ''
-    const role = token.replace('mock-access-token-', '')
-    const user = MOCK_USERS.find((u) => u.role === role)
+    const parts = token.replace('mock-token-', '').split('-')
+    const userId = parseInt(parts[1])
+    const user = MOCK_USERS.find((u) => u.id === userId)
     if (!user) throw { response: { status: 401 } }
     const { password: _, ...safeUser } = user
     return { data: safeUser }
   },
   async changePassword() {
     await delay(200)
-    return { data: { detail: "Parol o'zgartirildi" } }
-  },
-  async changeLogin(payload) {
-    await delay(200)
-    return { data: { username: payload.username } }
+    return { data: { message: "Parol o'zgartirildi" } }
   },
 }
 
@@ -399,22 +237,31 @@ export const mockAuthService = {
 export const mockUsersService = {
   async getAll(params = {}) {
     await delay(200)
-    let users = [
-      ...MOCK_STUDENTS,
-      ...MOCK_TEACHERS,
-      ...MOCK_USERS.filter((u) => u.role === 'admin'),
-    ]
+    let users = MOCK_USERS.map(({ password: _, ...u }) => u)
     if (params.role) users = users.filter((u) => u.role === params.role)
-    return { data: { results: users, count: users.length } }
+    if (params.category_slug)
+      users = users.filter((u) => u.category?.slug === params.category_slug)
+    if (params.class_id) users = users.filter((u) => u.class?.id == params.class_id)
+    return { data: { data: users, total: users.length } }
   },
   async getById(id) {
     await delay(150)
-    const all = [...MOCK_STUDENTS, ...MOCK_TEACHERS, ...MOCK_USERS]
-    return { data: all.find((u) => u.id == id) || null }
+    const user = MOCK_USERS.find((u) => u.id == id)
+    if (!user) throw { response: { status: 404 } }
+    const { password: _, ...safe } = user
+    return { data: safe }
   },
   async create(payload) {
     await delay(300)
-    return { data: { id: Date.now(), ...payload } }
+    const newUser = {
+      id: Date.now(),
+      ...payload,
+      qr_checkin: `QR_IN_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      qr_checkout: `QR_OUT_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+    }
+    MOCK_USERS.push(newUser)
+    const { password: _, ...safe } = newUser
+    return { data: safe }
   },
   async update(id, payload) {
     await delay(300)
@@ -424,57 +271,27 @@ export const mockUsersService = {
     await delay(200)
     return { data: {} }
   },
-}
-
-// ── Mock Groups Service ───────────────────────────────────────
-export const mockGroupsService = {
-  async getAll() {
-    await delay(200)
-    return { data: { results: MOCK_GROUPS, count: MOCK_GROUPS.length } }
-  },
-  async getById(id) {
+  async getQr(id) {
     await delay(150)
-    return { data: MOCK_GROUPS.find((g) => g.id == id) }
+    const user = MOCK_USERS.find((u) => u.id == id)
+    if (!user) throw { response: { status: 404 } }
+    return { data: { qr_checkin: user.qr_checkin, qr_checkout: user.qr_checkout } }
   },
-  async create(p) {
+  async regenerateQr(id) {
     await delay(300)
-    return { data: { id: Date.now(), ...p, students_count: 0 } }
-  },
-  async update(id, p) {
-    await delay(300)
-    return { data: { ...MOCK_GROUPS.find((g) => g.id == id), ...p } }
-  },
-  async delete() {
-    await delay(200)
-    return { data: {} }
-  },
-  async getStudents() {
-    await delay(200)
-    return { data: MOCK_STUDENTS }
-  },
-  async getSubjects() {
-    await delay(200)
-    return { data: MOCK_SUBJECTS }
-  },
-  async getSchedule() {
-    await delay(200)
-    return { data: MOCK_SCHEDULE }
-  },
-  async getStats() {
-    await delay(200)
-    return { data: { attendance: 85, avg_grade: 78 } }
+    const qr_checkin = `QR_IN_${id}_${Math.random().toString(36).slice(2, 8)}`
+    const qr_checkout = `QR_OUT_${id}_${Math.random().toString(36).slice(2, 8)}`
+    const user = MOCK_USERS.find((u) => u.id == id)
+    if (user) { user.qr_checkin = qr_checkin; user.qr_checkout = qr_checkout }
+    return { data: { qr_checkin, qr_checkout } }
   },
 }
 
-// ── Mock Subjects Service ─────────────────────────────────────
-export const mockSubjectsService = {
+// ── Mock Categories Service ───────────────────────────────────
+export const mockCategoriesService = {
   async getAll() {
-    await delay(200)
-    return { data: { results: MOCK_SUBJECTS, count: MOCK_SUBJECTS.length } }
-  },
-  async getById(id) {
     await delay(150)
-    return { data: MOCK_SUBJECTS.find((s) => s.id == id) }
+    return { data: MOCK_CATEGORIES }
   },
   async create(p) {
     await delay(300)
@@ -490,19 +307,17 @@ export const mockSubjectsService = {
   },
 }
 
-// ── Mock Assignments Service ──────────────────────────────────
-export const mockAssignmentsService = {
-  async getAll() {
-    await delay(200)
-    return { data: { results: MOCK_ASSIGNMENTS, count: MOCK_ASSIGNMENTS.length } }
-  },
-  async getById(id) {
+// ── Mock Classes Service ──────────────────────────────────────
+export const mockClassesService = {
+  async getAll(params = {}) {
     await delay(150)
-    return { data: MOCK_ASSIGNMENTS.find((a) => a.id == id) }
+    let classes = [...MOCK_CLASSES]
+    if (params.category_id) classes = classes.filter((c) => c.category_id == params.category_id)
+    return { data: classes }
   },
   async create(p) {
     await delay(300)
-    return { data: { id: Date.now(), ...p, upload_open: true, submissions_count: 0 } }
+    return { data: { id: Date.now(), ...p } }
   },
   async update(id, p) {
     await delay(300)
@@ -511,156 +326,122 @@ export const mockAssignmentsService = {
   async delete() {
     await delay(200)
     return { data: {} }
-  },
-  async toggleUpload(id, p) {
-    await delay(200)
-    const a = MOCK_ASSIGNMENTS.find((a) => a.id == id)
-    if (a) a.upload_open = p.upload_open
-    return { data: { upload_open: p.upload_open } }
-  },
-  async submit() {
-    await delay(400)
-    return { data: { id: Date.now(), submitted_at: new Date().toISOString() } }
-  },
-  async getSubmissions() {
-    await delay(200)
-    return {
-      data: MOCK_STUDENTS.slice(0, 3).map((s, i) => ({
-        id: i + 1,
-        student_name: s.full_name,
-        file_url: '#',
-        file_name: 'homework.pdf',
-        submitted_at: new Date(Date.now() - i * 3600000).toISOString(),
-        grade: i === 0 ? 90 : null,
-      })),
-    }
-  },
-  async gradeSubmission(id, p) {
-    await delay(200)
-    return { data: { id, ...p } }
   },
 }
 
 // ── Mock Attendance Service ───────────────────────────────────
 export const mockAttendanceService = {
-  async getAll() {
-    await delay(200)
-    return { data: MOCK_ATTENDANCE }
-  },
-  async save(p) {
-    await delay(300)
-    return { data: p }
-  },
-  async getStudentAttendance() {
-    await delay(200)
-    return { data: MOCK_ATTENDANCE }
-  },
-  async getGroupStats() {
-    await delay(200)
-    return {
-      data: MOCK_STUDENTS.map((s) => ({
-        student_id: s.id,
-        full_name: s.full_name,
-        present: 8,
-        absent: 2,
-        excused: 1,
-        total: 11,
-        percentage: 73,
-      })),
+  async scan(qrCode) {
+    await delay(500)
+    const isCheckin = qrCode.startsWith('QR_IN_')
+    const isCheckout = qrCode.startsWith('QR_OUT_')
+    if (!isCheckin && !isCheckout) {
+      throw { response: { data: { message: 'QR kod noto\'g\'ri' } } }
     }
-  },
-}
 
-// ── Mock Resources Service ────────────────────────────────────
-export const mockResourcesService = {
-  async getAll() {
+    const user = MOCK_USERS.find(
+      (u) => u.qr_checkin === qrCode || u.qr_checkout === qrCode,
+    )
+    if (!user) throw { response: { data: { message: 'Foydalanuvchi topilmadi' } } }
+
+    const type = isCheckin ? 'checkin' : 'checkout'
+    const { password: _, ...safeUser } = user
+    const log = {
+      id: nextLogId++,
+      user_id: user.id,
+      user: { id: user.id, full_name: user.full_name, category: user.category, class: user.class },
+      type,
+      scanned_at: new Date().toISOString(),
+      is_late: false,
+    }
+    MOCK_LOGS.push(log)
+    return { data: { log, user: safeUser } }
+  },
+
+  async manualCheckin(userId) {
+    await delay(300)
+    const user = MOCK_USERS.find((u) => u.id == userId)
+    if (!user) throw { response: { status: 404 } }
+    const log = {
+      id: nextLogId++,
+      user_id: user.id,
+      user: { id: user.id, full_name: user.full_name, category: user.category, class: user.class },
+      type: 'checkin',
+      scanned_at: new Date().toISOString(),
+      is_late: false,
+    }
+    MOCK_LOGS.push(log)
+    return { data: log }
+  },
+
+  async manualCheckout(userId) {
+    await delay(300)
+    const user = MOCK_USERS.find((u) => u.id == userId)
+    if (!user) throw { response: { status: 404 } }
+    const log = {
+      id: nextLogId++,
+      user_id: user.id,
+      user: { id: user.id, full_name: user.full_name, category: user.category, class: user.class },
+      type: 'checkout',
+      scanned_at: new Date().toISOString(),
+      is_late: false,
+    }
+    MOCK_LOGS.push(log)
+    return { data: log }
+  },
+
+  async getLive() {
     await delay(200)
-    return { data: { results: MOCK_RESOURCES, count: MOCK_RESOURCES.length } }
+    // Hozir binoda bo'lganlar: oxirgi logli checkin, checkout yo'q
+    const lastByUser = {}
+    MOCK_LOGS.forEach((log) => {
+      if (!lastByUser[log.user_id] || log.scanned_at > lastByUser[log.user_id].scanned_at) {
+        lastByUser[log.user_id] = log
+      }
+    })
+    const inside = Object.values(lastByUser).filter((l) => l.type === 'checkin')
+    return { data: inside }
   },
-  async getById(id) {
-    await delay(150)
-    return { data: MOCK_RESOURCES.find((r) => r.id == id) }
+
+  async getDaily(date) {
+    await delay(200)
+    const d = date || today
+    const logs = MOCK_LOGS.filter((l) => l.scanned_at.startsWith(d))
+    return { data: logs }
   },
-  async create(fd) {
-    await delay(400)
+
+  async getByUser(userId, params = {}) {
+    await delay(200)
+    let logs = MOCK_LOGS.filter((l) => l.user_id == userId)
+    if (params.date) logs = logs.filter((l) => l.scanned_at.startsWith(params.date))
+    return { data: logs }
+  },
+
+  async getSummary(params = {}) {
+    await delay(200)
+    const checkins = MOCK_LOGS.filter((l) => l.type === 'checkin').length
+    const checkouts = MOCK_LOGS.filter((l) => l.type === 'checkout').length
+    const lates = MOCK_LOGS.filter((l) => l.is_late).length
+    return { data: { checkins, checkouts, lates, total_users: MOCK_USERS.length - 2 } }
+  },
+
+  async getStats() {
+    await delay(200)
     return {
       data: {
-        id: Date.now(),
-        title: fd.get?.('title') || 'Yangi resurs',
-        type: fd.get?.('type') || 'file',
+        today_checkins: MOCK_LOGS.filter((l) => l.type === 'checkin' && l.scanned_at.startsWith(today)).length,
+        today_checkouts: MOCK_LOGS.filter((l) => l.type === 'checkout' && l.scanned_at.startsWith(today)).length,
+        currently_inside: 4,
+        late_today: MOCK_LOGS.filter((l) => l.is_late && l.scanned_at.startsWith(today)).length,
+        weekly: [
+          { day: 'Du', checkins: 42, checkouts: 38 },
+          { day: 'Se', checkins: 45, checkouts: 41 },
+          { day: 'Ch', checkins: 40, checkouts: 37 },
+          { day: 'Pa', checkins: 44, checkouts: 40 },
+          { day: 'Ju', checkins: 38, checkouts: 35 },
+        ],
       },
     }
-  },
-  async update(id, fd) {
-    await delay(300)
-    return { data: { id } }
-  },
-  async delete() {
-    await delay(200)
-    return { data: {} }
-  },
-  async download() {
-    await delay(200)
-    return { data: new Blob(['mock file content']) }
-  },
-}
-
-// ── Mock Grades Service ───────────────────────────────────────
-export const mockGradesService = {
-  async getAll() {
-    await delay(200)
-    return { data: { results: MOCK_GRADES, count: MOCK_GRADES.length } }
-  },
-  async create(p) {
-    await delay(300)
-    return { data: { id: Date.now(), ...p } }
-  },
-  async update(id, p) {
-    await delay(300)
-    return { data: { id, ...p } }
-  },
-  async bulkSave(p) {
-    await delay(400)
-    return { data: p }
-  },
-  async getStudentGrades() {
-    await delay(200)
-    return { data: MOCK_GRADES }
-  },
-  async getGroupGrades() {
-    await delay(200)
-    return { data: MOCK_GRADES }
-  },
-  async getWeeklyResults() {
-    await delay(200)
-    return {
-      data: [
-        { week: 1, week_label: '1-hafta', avg_grade: 72 },
-        { week: 2, week_label: '2-hafta', avg_grade: 78 },
-        { week: 3, week_label: '3-hafta', avg_grade: 75 },
-        { week: 4, week_label: '4-hafta', avg_grade: 82 },
-      ],
-    }
-  },
-}
-
-// ── Mock Schedule Service ─────────────────────────────────────
-export const mockScheduleService = {
-  async getAll() {
-    await delay(200)
-    return { data: { results: MOCK_SCHEDULE, count: MOCK_SCHEDULE.length } }
-  },
-  async create(p) {
-    await delay(300)
-    return { data: { id: Date.now(), ...p } }
-  },
-  async update(id, p) {
-    await delay(300)
-    return { data: { id, ...p } }
-  },
-  async delete() {
-    await delay(200)
-    return { data: {} }
   },
 }
 
@@ -668,22 +449,18 @@ export const mockScheduleService = {
 export const mockNotificationsService = {
   async getAll() {
     await delay(200)
-    return { data: MOCK_NOTIFICATIONS }
+    return {
+      data: [
+        { id: 1, message: 'Aliyev Jasur kech keldi', is_read: false, created_at: new Date(Date.now() - 600000).toISOString() },
+        { id: 2, message: 'Toshmatov Sherzod chiqib ketdi', is_read: true, created_at: new Date(Date.now() - 3600000).toISOString() },
+      ],
+    }
   },
   async markRead(id) {
     await delay(100)
-    const n = MOCK_NOTIFICATIONS.find((n) => n.id == id)
-    if (n) n.is_read = true
     return { data: {} }
   },
   async markAllRead() {
-    await delay(100)
-    MOCK_NOTIFICATIONS.forEach((n) => {
-      n.is_read = true
-    })
-    return { data: {} }
-  },
-  async delete() {
     await delay(100)
     return { data: {} }
   },

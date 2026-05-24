@@ -11,27 +11,16 @@ export const formatDate = (date, fmt = 'DD.MM.YYYY') => (date ? dayjs(date).form
 
 export const formatDateTime = (date) => (date ? dayjs(date).format('DD.MM.YYYY HH:mm') : '—')
 
+export const formatTime = (date) => (date ? dayjs(date).format('HH:mm') : '—')
+
 export const fromNow = (date) => (date ? dayjs(date).fromNow() : '—')
 
-export const timeLeft = (deadline) => {
-  if (!deadline) return null
-  const diff = dayjs(deadline).diff(dayjs())
-  if (diff <= 0) return { expired: true, label: 'Muddat tugagan' }
-  const d = dayjs.duration(diff)
-  const days = Math.floor(d.asDays())
-  const hours = d.hours()
-  const mins = d.minutes()
-  if (days > 0) return { expired: false, label: `${days} kun ${hours} soat qoldi` }
-  if (hours > 0) return { expired: false, label: `${hours} soat ${mins} daqiqa qoldi` }
-  return { expired: false, label: `${mins} daqiqa qoldi` }
-}
-
-export const formatFileSize = (bytes) => {
-  if (!bytes) return '0 B'
-  const k = 1024
-  const sizes = ['B', 'KB', 'MB', 'GB']
-  const i = Math.floor(Math.log(bytes) / Math.log(k))
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))} ${sizes[i]}`
+export const minutesToHm = (minutes) => {
+  if (!minutes || minutes < 0) return '—'
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (h === 0) return `${m} daq`
+  return m === 0 ? `${h} soat` : `${h} soat ${m} daq`
 }
 
 export const formatPercent = (val) =>

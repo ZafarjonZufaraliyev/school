@@ -12,8 +12,8 @@ export function useAuth() {
     if (result.success) {
       const role = authStore.userRole
       if (role === 'admin') router.push('/admin/dashboard')
-      else if (role === 'teacher') router.push('/teacher/dashboard')
-      else router.push('/student/dashboard')
+      else if (role === 'guard') router.push('/guard/scanner')
+      else router.push('/member/qr')
     } else {
       toast.error(result.message)
     }
