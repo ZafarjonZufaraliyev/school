@@ -117,6 +117,8 @@ const errorMsg = ref('')
 const recentScans = ref([])
 
 let html5QrCode = null
+let cooldownTimer = null
+const COOLDOWN_MS = 3000
 
 const resultClass = computed(() => {
   if (!lastResult.value) return ''
@@ -145,10 +147,11 @@ async function processCode(code) {
     recentScans.value.unshift(data.log)
     if (recentScans.value.length > 10) recentScans.value.pop()
     manualCode.value = ''
+    // cooldown: keyingi scan uchun kutish
+    cooldownTimer = setTimeout(() => { scanning.value = false }, COOLDOWN_MS)
   } catch (err) {
     errorMsg.value = err.response?.data?.message ?? 'QR kod noto\'g\'ri yoki topilmadi'
     setTimeout(() => { errorMsg.value = '' }, 3000)
-  } finally {
     scanning.value = false
   }
 }
@@ -172,6 +175,7 @@ async function stopCamera() {
   if (html5QrCode?.isScanning) {
     await html5QrCode.stop()
   }
+  if (cooldownTimer) clearTimeout(cooldownTimer)
 }
 
 onMounted(() => { if (mode.value === 'camera') startCamera() })
